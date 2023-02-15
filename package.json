@@ -38,7 +38,12 @@
     "yup": "^0.32.11"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "env-cmd -f .env.Dev react-scripts start",
+    "start:qa": "env-cmd -f .env.QA react-scripts start",
+    "start:uat": "env-cmd -f .env.UAT react-scripts start",
+    "build:dev": "env-cmd -f .env.Dev react-scripts build",
+    "build:qa": "env-cmd -f .env.QA react-scripts build",
+    "build:uat": "env-cmd -f .env.QA react-scripts build",
     "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

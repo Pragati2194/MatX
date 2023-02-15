@@ -2,6 +2,7 @@ import React, { createContext, useEffect, useReducer } from 'react'
 import jwtDecode from 'jwt-decode'
 import axios from 'axios.js'
 import { MatxLoading } from 'app/components'
+import { default_host } from "../../serviceWorker";
 
 const initialState = {
     isAuthenticated: false,
@@ -19,12 +20,16 @@ const isValidToken = (accessToken) => {
     return decodedToken.exp > currentTime
 }
 
-const setSession = (accessToken) => {
-    if (accessToken) {
+// const setSession = (accessToken) => {                                            //comment - original data saved for backup
+const setSession = (accessToken, refreshToken) => {
+    // if (accessToken) {                                                           //comment - original data saved for backup
+    if (accessToken && refreshToken) {
         localStorage.setItem('accessToken', accessToken)
+        localStorage.setItem('refreshToken', refreshToken)
         axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`
     } else {
         localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
         delete axios.defaults.headers.common.Authorization
     }
 }
@@ -66,6 +71,15 @@ const reducer = (state, action) => {
                 user,
             }
         }
+        case 'FORGOTPASSWORD': {
+            const { user } = action.payload
+
+            return {
+                ...state,
+                isAuthenticated: true,
+                user,
+            }
+        }
         default: {
             return { ...state }
         }
@@ -78,19 +92,25 @@ const AuthContext = createContext({
     login: () => Promise.resolve(),
     logout: () => { },
     register: () => Promise.resolve(),
+    forgotPassword: () => Promise.resolve()
 })
 
 export const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState)
 
     const login = async (email, password) => {
-        const response = await axios.post('/api/auth/login', {
-            email,
-            password,
-        })
-        const { accessToken, user } = response.data
+        // const response = await axios.post('/api/auth/login', {           //comment - original data saved for backup
+        //     email,
+        //     password,
+        // })
+        const payLoad = {password: password, emailAddress: email};
+        const response = await axios.post(`${default_host}/auth/login`, payLoad)
 
-        setSession(accessToken)
+        // const { accessToken, user } = response.data                      //comment - original data saved for backup
+        const { tokens, user } = response.data
+
+        // setSession(accessToken)                                          //comment - original data saved for backup
+        setSession(tokens.access.token, tokens.refresh.token)
 
         dispatch({
             type: 'LOGIN',
@@ -100,12 +120,15 @@ export const AuthProvider = ({ children }) => {
         })
     }
 
-    const register = async (email, username, password) => {
-        const response = await axios.post('/api/auth/register', {
-            email,
-            username,
-            password,
-        })
+    // const register = async (email, username, password) => {              //comment - original data saved for backup
+    const register = async (email, password, role, firstName, lastName, mobileNumber, designation, organizationName) => {
+        // const response = await axios.post('/api/auth/register', {        //comment - original data saved for backup
+        //     email,
+        //     username,
+        //     password,
+        // })
+        const payLoad = {password: password, emailAddress: email, role: role, firstName: firstName, lastName: lastName, mobileNumber: (mobileNumber.toString()), designation: designation, organizationName: organizationName};
+        const response = await axios.post(`${default_host}/auth/register`, payLoad)
 
         const { accessToken, user } = response.data
 
@@ -119,9 +142,18 @@ export const AuthProvider = ({ children }) => {
         })
     }
 
-    const logout = () => {
+    // const logout = () => {                                               //comment - original data saved for backup
+    const logout = async () => {
+        const payLoad = {refreshToken: localStorage.getItem("refreshToken")};
+        await axios.post(`${default_host}/auth/logout`, payLoad)
         setSession(null)
         dispatch({ type: 'LOGOUT' })
+    }
+
+    const forgotPassword = async (email) => {
+        const payLoad = {email: email};
+        await axios.post(`${default_host}/auth/forgot-password`, payLoad)
+        // dispatch({ type: 'FORGOTPASSWORD' })
     }
 
     useEffect(() => {
@@ -175,6 +207,7 @@ export const AuthProvider = ({ children }) => {
                 login,
                 logout,
                 register,
+                forgotPassword,
             }}
         >
             {children}

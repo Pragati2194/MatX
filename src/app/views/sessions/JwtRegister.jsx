@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import { LoadingButton } from '@mui/lab';
-import { Card, Checkbox, Grid, TextField } from '@mui/material';
+import { Card, Checkbox, Grid, TextField, MenuItem, InputLabel, FormControl, Select } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { Paragraph } from 'app/components/Typography';
 import useAuth from 'app/hooks/useAuth';
@@ -36,8 +36,14 @@ const JWTRegister = styled(JustifyBox)(() => ({
 const initialValues = {
   email: '',
   password: '',
-  username: '',
+  // username: '',          //comment - original data saved for backup
   remember: true,
+  organizationName: '',
+  role: '',
+  firstName: '',
+  lastName: '',
+  mobileNumber: '',
+  designation: '',
 };
 
 // form field validation schema
@@ -53,12 +59,15 @@ const JwtRegister = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [selectedRole, setSelectedRole] = useState("");
 
   const handleFormSubmit = (values) => {
+    values.role = selectedRole;
     setLoading(true);
 
     try {
-      register(values.email, values.username, values.password);
+      // register(values.email, values.username, values.password);          //comment - original data saved for backup
+      register(values.email, values.password, values.role, values.firstName, values.lastName, values.mobileNumber, values.designation);
       navigate('/');
       setLoading(false);
     } catch (e) {
@@ -67,6 +76,9 @@ const JwtRegister = () => {
     }
   };
 
+  const handleRoleChange = (e) => {
+    setSelectedRole(e.target.value);
+  }
   return (
     <JWTRegister>
       <Card className="card">
@@ -90,7 +102,7 @@ const JwtRegister = () => {
               >
                 {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
                   <form onSubmit={handleSubmit}>
-                    <TextField
+                    {/* <TextField                              //comment - original data saved for backup
                       fullWidth
                       size="small"
                       type="text"
@@ -103,14 +115,90 @@ const JwtRegister = () => {
                       helperText={touched.username && errors.username}
                       error={Boolean(errors.username && touched.username)}
                       sx={{ mb: 3 }}
+                    /> */}
+                    <FormControl 
+                      fullWidth
+                      size="small"
+                      sx={{ mb: 3 }}
+                    >
+                      <InputLabel id="role-select-label">Role</InputLabel>
+                      <Select
+                        labelId="role-select-label"
+                        id="role-select"
+                        value={selectedRole}
+                        label="Role"
+                        onChange={(e) => handleRoleChange(e)}
+                      >
+                        <MenuItem value="candidate">Candidate</MenuItem>
+                        <MenuItem value="recruiter">Recruiter</MenuItem>
+                        {/* <MenuItem value="user">User</MenuItem> */}
+                        {/* <MenuItem value="employer">Employer</MenuItem> */}
+                        {/* <MenuItem value="admin">Admin</MenuItem> */}
+                      </Select>
+                    </FormControl>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type="text"
+                      name="organizationName"
+                      label="OrganizationName *"
+                      variant="outlined"
+                      onBlur={handleBlur}
+                      value={values.organizationName}
+                      onChange={handleChange}
+                      helperText={touched.organizationName && errors.organizationName}
+                      error={Boolean(errors.organizationName && touched.organizationName)}
+                      sx={{ mb: 3 }}
                     />
 
                     <TextField
                       fullWidth
                       size="small"
+                      type="text"
+                      name="firstName"
+                      label="FirstName *"
+                      variant="outlined"
+                      onBlur={handleBlur}
+                      value={values.firstName}
+                      onChange={handleChange}
+                      helperText={touched.firstName && errors.firstName}
+                      error={Boolean(errors.firstName && touched.firstName)}
+                      sx={{ mb: 3 }}
+                    />
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type="text"
+                      name="lastName"
+                      label="LastName *"
+                      variant="outlined"
+                      onBlur={handleBlur}
+                      value={values.lastName}
+                      onChange={handleChange}
+                      helperText={touched.lastName && errors.lastName}
+                      error={Boolean(errors.lastName && touched.lastName)}
+                      sx={{ mb: 3 }}
+                    />
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type="number"
+                      name="mobileNumber"
+                      label="MobileNumber *"
+                      variant="outlined"
+                      onBlur={handleBlur}
+                      value={values.mobileNumber}
+                      onChange={handleChange}
+                      helperText={touched.mobileNumber && errors.mobileNumber}
+                      error={Boolean(errors.mobileNumber && touched.mobileNumber)}
+                      sx={{ mb: 3 }}
+                    />
+                    <TextField
+                      fullWidth
+                      size="small"
                       type="email"
                       name="email"
-                      label="Email"
+                      label="Email *"
                       variant="outlined"
                       onBlur={handleBlur}
                       value={values.email}
@@ -124,7 +212,7 @@ const JwtRegister = () => {
                       size="small"
                       name="password"
                       type="password"
-                      label="Password"
+                      label="Password *"
                       variant="outlined"
                       onBlur={handleBlur}
                       value={values.password}
@@ -134,6 +222,20 @@ const JwtRegister = () => {
                       sx={{ mb: 2 }}
                     />
 
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type="text"
+                      name="designation"
+                      label="Designation *"
+                      variant="outlined"
+                      onBlur={handleBlur}
+                      value={values.designation}
+                      onChange={handleChange}
+                      helperText={touched.designation && errors.designation}
+                      error={Boolean(errors.designation && touched.designation)}
+                      sx={{ mb: 3 }}
+                    />
                     <FlexBox gap={1} alignItems="center">
                       <Checkbox
                         size="small"

@@ -129,3 +129,5 @@ export function unregister() {
     });
   }
 }
+
+export const default_host=process.env.REACT_APP_PATH  //dev instance
