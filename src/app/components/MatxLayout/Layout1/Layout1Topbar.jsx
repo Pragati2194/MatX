@@ -111,8 +111,7 @@ const Layout1Topbar = () => {
     }
     updateSidebarMode({ mode });
   };
-
-
+  
   return (
     <TopbarRoot>
       <TopbarContainer>
