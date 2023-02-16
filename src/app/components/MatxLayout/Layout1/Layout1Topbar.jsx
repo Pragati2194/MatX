@@ -9,7 +9,8 @@ import { topBarHeight } from 'app/utils/constant';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Span } from '../../Typography';
+// import { Span } from '../../Typography';
+import { Span } from '../../../components/Typography';
 import NotificationBar from '../../NotificationBar/NotificationBar';
 import ShoppingCart from '../../ShoppingCart';
 import BackgroundLetterAvatars from 'app/components/icons/AvtarIcon';
@@ -111,7 +112,7 @@ const Layout1Topbar = () => {
     }
     updateSidebarMode({ mode });
   };
-  
+
   return (
     <TopbarRoot>
       <TopbarContainer>
