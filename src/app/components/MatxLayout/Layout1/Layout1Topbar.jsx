@@ -1,4 +1,4 @@
-import { Avatar, Hidden, Icon, IconButton, MenuItem, useMediaQuery } from '@mui/material';
+import { Hidden, Icon, IconButton, MenuItem, useMediaQuery } from '@mui/material';
 import { Box, styled, useTheme } from '@mui/system';
 import { MatxMenu, MatxSearchBox } from 'app/components';
 import { themeShadows } from 'app/components/MatxTheme/themeColors';
@@ -6,11 +6,13 @@ import { NotificationProvider } from 'app/contexts/NotificationContext';
 import useAuth from 'app/hooks/useAuth';
 import useSettings from 'app/hooks/useSettings';
 import { topBarHeight } from 'app/utils/constant';
-import React from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Span } from '../../../components/Typography';
+import { Span } from '../../Typography';
 import NotificationBar from '../../NotificationBar/NotificationBar';
 import ShoppingCart from '../../ShoppingCart';
+import BackgroundLetterAvatars from 'app/components/icons/AvtarIcon';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.primary,
@@ -73,8 +75,25 @@ const IconBox = styled('div')(({ theme }) => ({
 const Layout1Topbar = () => {
   const theme = useTheme();
   const { settings, updateSettings } = useSettings();
-  const { logout, user } = useAuth();
+  const [updateValue, setUpdateValue] = useState({});
+  const { logout } = useAuth();
   const isMdScreen = useMediaQuery(theme.breakpoints.down('md'));
+  useEffect(() => {
+    currentUserAPI();
+  }, []);
+
+  const currentUserAPI = (() => {
+    const axiosCall = axios({
+      method: "get",
+      url: 'http://localhost:5000/v1/users/currentUser',
+      headers: { Authorization: "Bearer " + localStorage.getItem('accessToken') },
+    }).then((response) => {
+      setUpdateValue({ ...response.data.user });
+    });
+    axiosCall.catch((e) => {
+      alert(e)
+    });
+  });
 
   const updateSidebarMode = (sidebarSettings) => {
     updateSettings({
@@ -92,6 +111,7 @@ const Layout1Topbar = () => {
     }
     updateSidebarMode({ mode });
   };
+
 
   return (
     <TopbarRoot>
@@ -130,10 +150,10 @@ const Layout1Topbar = () => {
               <UserMenu>
                 <Hidden xsDown>
                   <Span>
-                    Hi <strong>{user.name}</strong>
+                    Hi <strong>{updateValue?.firstName + ' ' + updateValue?.lastName}</strong>
                   </Span>
                 </Hidden>
-                <Avatar src={user.avatar} sx={{ cursor: 'pointer' }} />
+                <BackgroundLetterAvatars name={updateValue?.firstName + ' ' + updateValue?.lastName} ></BackgroundLetterAvatars>
               </UserMenu>
             }
           >
@@ -145,7 +165,7 @@ const Layout1Topbar = () => {
             </StyledItem>
 
             <StyledItem>
-              <Link to="/page-layouts/user-profile">
+              <Link to="/session/profile">
                 <Icon> person </Icon>
                 <Span> Profile </Span>
               </Link>
