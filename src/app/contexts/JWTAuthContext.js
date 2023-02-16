@@ -117,10 +117,10 @@ export const AuthProvider = ({ children }) => {
             const payLoad = { password: password, emailAddress: email };
             const response = await axios.post(`${default_host}/auth/login`, payLoad)
 
-            if (response.status === 200) {
-                alert("Login Successfully!");
-            }
-            console.log("Loginres", response);
+            // if (response.status === 200) {
+            //     alert("Login Successfully!");
+            // }
+            // console.log("Loginres", response);
 
             // const { accessToken, user } = response.data                      //comment - original data saved for backup
             const { tokens, user } = response.data
@@ -183,7 +183,7 @@ export const AuthProvider = ({ children }) => {
 
     const forgotPassword = async (email) => {
         try {
-            const payLoad = { email: email, targetUrl: `${system_host}/session` };
+            const payLoad = { email: email, targetUrl: `${system_host}/session/` };
             var res = await axios.post(`${default_host}/auth/forgot-password`, payLoad)
             alert(res.data.message)
             // dispatch({ type: 'FORGOTPASSWORD' })
