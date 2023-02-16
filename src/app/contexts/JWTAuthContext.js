@@ -142,9 +142,11 @@ export const AuthProvider = ({ children }) => {
         const payLoad = {emailAddress: email, password: password, firstName: firstName, lastName: lastName, mobileNumber: (mobileNumber.toString()), designation: designation, organizationName: organizationName};
         const response = await axios.post(`${default_host}/auth/register`, payLoad)
 
-        const { accessToken, user } = response.data
+        // const { accessToken, user } = response.data                      //comment - original data saved for backup
+        const { tokens, user } = response.data
 
-        setSession(accessToken)
+        // setSession(accessToken)                                          //comment - original data saved for backup
+        setSession(tokens.access.token, tokens.refresh.token)
 
         dispatch({
             type: 'REGISTER',
@@ -163,7 +165,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     const forgotPassword = async (email) => {
-        const payLoad = {email: email, targetUrl: `${system_host}/session`};
+        const payLoad = {email: email, targetUrl: `${system_host}/session/`};
         await axios.post(`${default_host}/auth/forgot-password`, payLoad)
         // dispatch({ type: 'FORGOTPASSWORD' })
     }
@@ -176,12 +178,16 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         ; (async () => {
+            debugger;
             try {
                 const accessToken = window.localStorage.getItem('accessToken')
+                const refreshToken = window.localStorage.getItem('refreshToken')
 
                 if (accessToken && isValidToken(accessToken)) {
-                    setSession(accessToken)
-                    const response = await axios.get('/api/auth/profile')
+                    setSession(accessToken, refreshToken)
+
+                    // const response = await axios.get('/api/auth/profile')        //comment - original data saved for backup
+                    const response = await axios.get(`${default_host}/users/currentUser`)
                     const { user } = response.data
 
                     dispatch({
