@@ -193,7 +193,9 @@ export const AuthProvider = ({ children }) => {
     }
 
     const confirmPassword = async (password) => {
-        const payLoad = { password: password };
+        const payLoad = { password: password, };
+
+        axios.defaults.headers.common.Authorization = `Bearer ${localStorage.getItem('accessToken')}`
         await axios.post(`${default_host}/auth/reset-password`, payLoad)
         dispatch({ type: 'CONFIRMPASSWORD' })
     }
