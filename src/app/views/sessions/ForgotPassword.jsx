@@ -2,6 +2,7 @@ import { Box, Button, Card, Grid, styled, TextField } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from 'app/hooks/useAuth';
+import { LoadingButton } from '@mui/lab';
 
 const FlexBox = styled(Box)(() => ({
   display: 'flex',
@@ -30,16 +31,19 @@ const ForgotPasswordRoot = styled(JustifyBox)(() => ({
 const ForgotPassword = () => {
   const { forgotPassword } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('admin@example.com');
+  // const [email, setEmail] = useState('admin@example.com');         //comment - original data saved for backup
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       forgotPassword(email);
     } catch (e) {
       console.log(e);
     }
+    setLoading(false);
   };
 
   return (
@@ -64,9 +68,9 @@ const ForgotPassword = () => {
                   sx={{ mb: 3, width: '100%' }}
                 />
 
-                <Button fullWidth variant="contained" color="primary" type="submit">
+                <LoadingButton fullWidth variant="contained" color="primary" type="submit" loading={loading}>
                   Reset Password
-                </Button>
+                </LoadingButton>
 
                 <Button
                   fullWidth

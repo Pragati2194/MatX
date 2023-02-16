@@ -1,6 +1,7 @@
 import { useTheme } from '@emotion/react';
 import { LoadingButton } from '@mui/lab';
-import { Card, Checkbox, Grid, TextField, MenuItem, InputLabel, FormControl, Select } from '@mui/material';
+// import { Card, Checkbox, Grid, TextField, MenuItem, InputLabel, FormControl, Select } from '@mui/material';
+import { Card, Checkbox, Grid, TextField } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { Paragraph } from 'app/components/Typography';
 import useAuth from 'app/hooks/useAuth';
@@ -38,12 +39,13 @@ const initialValues = {
   password: '',
   // username: '',          //comment - original data saved for backup
   remember: true,
-  organizationName: '',
-  role: '',
+  
+  // role: '',              //comment - previously for role
   firstName: '',
   lastName: '',
   mobileNumber: '',
   designation: '',
+  organizationName: '',
 };
 
 // form field validation schema
@@ -59,15 +61,16 @@ const JwtRegister = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [selectedRole, setSelectedRole] = useState("");
+  // const [selectedRole, setSelectedRole] = useState("");                  //comment - previously for role
 
   const handleFormSubmit = (values) => {
-    values.role = selectedRole;
+    // values.role = selectedRole;                                          //comment - previously for role
     setLoading(true);
 
     try {
       // register(values.email, values.username, values.password);          //comment - original data saved for backup
-      register(values.email, values.password, values.role, values.firstName, values.lastName, values.mobileNumber, values.designation);
+      // register(values.email, values.password, values.role, values.firstName, values.lastName, values.mobileNumber, values.designation);          //comment - previously for role
+      register(values.email, values.password, values.firstName, values.lastName, values.mobileNumber, values.designation, values.organizationName, );
       navigate('/');
       setLoading(false);
     } catch (e) {
@@ -76,9 +79,9 @@ const JwtRegister = () => {
     }
   };
 
-  const handleRoleChange = (e) => {
-    setSelectedRole(e.target.value);
-  }
+  // const handleRoleChange = (e) => {                                        //comment - previously for role
+  //   setSelectedRole(e.target.value);
+  // }
   return (
     <JWTRegister>
       <Card className="card">
@@ -116,7 +119,7 @@ const JwtRegister = () => {
                       error={Boolean(errors.username && touched.username)}
                       sx={{ mb: 3 }}
                     /> */}
-                    <FormControl 
+                    {/* <FormControl                                      //comment - previously for role
                       fullWidth
                       size="small"
                       sx={{ mb: 3 }}
@@ -131,17 +134,14 @@ const JwtRegister = () => {
                       >
                         <MenuItem value="candidate">Candidate</MenuItem>
                         <MenuItem value="recruiter">Recruiter</MenuItem>
-                        {/* <MenuItem value="user">User</MenuItem> */}
-                        {/* <MenuItem value="employer">Employer</MenuItem> */}
-                        {/* <MenuItem value="admin">Admin</MenuItem> */}
                       </Select>
-                    </FormControl>
+                    </FormControl> */}
                     <TextField
                       fullWidth
                       size="small"
                       type="text"
                       name="organizationName"
-                      label="OrganizationName *"
+                      label="Organization Name *"
                       variant="outlined"
                       onBlur={handleBlur}
                       value={values.organizationName}
@@ -156,7 +156,7 @@ const JwtRegister = () => {
                       size="small"
                       type="text"
                       name="firstName"
-                      label="FirstName *"
+                      label="First Name *"
                       variant="outlined"
                       onBlur={handleBlur}
                       value={values.firstName}
@@ -170,7 +170,7 @@ const JwtRegister = () => {
                       size="small"
                       type="text"
                       name="lastName"
-                      label="LastName *"
+                      label="Last Name *"
                       variant="outlined"
                       onBlur={handleBlur}
                       value={values.lastName}
@@ -184,7 +184,7 @@ const JwtRegister = () => {
                       size="small"
                       type="number"
                       name="mobileNumber"
-                      label="MobileNumber *"
+                      label="Mobile Number *"
                       variant="outlined"
                       onBlur={handleBlur}
                       value={values.mobileNumber}

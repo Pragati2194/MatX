@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useReducer } from 'react'
 import jwtDecode from 'jwt-decode'
 import axios from 'axios.js'
 import { MatxLoading } from 'app/components'
-import { default_host } from "../../serviceWorker";
+import { default_host, system_host } from "../../serviceWorker";
 
 const initialState = {
     isAuthenticated: false,
@@ -80,6 +80,15 @@ const reducer = (state, action) => {
                 user,
             }
         }
+        case 'CONFIRMPASSWORD': {
+            const { user } = action.payload
+
+            return {
+                ...state,
+                isAuthenticated: true,
+                user,
+            }
+        }
         default: {
             return { ...state }
         }
@@ -92,7 +101,8 @@ const AuthContext = createContext({
     login: () => Promise.resolve(),
     logout: () => { },
     register: () => Promise.resolve(),
-    forgotPassword: () => Promise.resolve()
+    forgotPassword: () => Promise.resolve(),
+    confirmPassword: () => Promise.resolve()
 })
 
 export const AuthProvider = ({ children }) => {
@@ -121,13 +131,15 @@ export const AuthProvider = ({ children }) => {
     }
 
     // const register = async (email, username, password) => {              //comment - original data saved for backup
-    const register = async (email, password, role, firstName, lastName, mobileNumber, designation, organizationName) => {
+    // const register = async (email, password, role, firstName, lastName, mobileNumber, designation, organizationName) => {    //comment - previously for role
+    const register = async (email, password, firstName, lastName, mobileNumber, designation, organizationName) => {
         // const response = await axios.post('/api/auth/register', {        //comment - original data saved for backup
         //     email,
         //     username,
         //     password,
         // })
-        const payLoad = {password: password, emailAddress: email, role: role, firstName: firstName, lastName: lastName, mobileNumber: (mobileNumber.toString()), designation: designation, organizationName: organizationName};
+        // const payLoad = {password: password, emailAddress: email, role: role, firstName: firstName, lastName: lastName, mobileNumber: (mobileNumber.toString()), designation: designation, organizationName: organizationName};      //comment - previously for role
+        const payLoad = {emailAddress: email, password: password, firstName: firstName, lastName: lastName, mobileNumber: (mobileNumber.toString()), designation: designation, organizationName: organizationName};
         const response = await axios.post(`${default_host}/auth/register`, payLoad)
 
         const { accessToken, user } = response.data
@@ -151,9 +163,15 @@ export const AuthProvider = ({ children }) => {
     }
 
     const forgotPassword = async (email) => {
-        const payLoad = {email: email};
+        const payLoad = {email: email, targetUrl: `${system_host}/session`};
         await axios.post(`${default_host}/auth/forgot-password`, payLoad)
         // dispatch({ type: 'FORGOTPASSWORD' })
+    }
+
+    const confirmPassword = async (password) => {
+        const payLoad = {password: password};
+        await axios.post(`${default_host}/auth/reset-password`, payLoad)
+        dispatch({ type: 'CONFIRMPASSWORD' })
     }
 
     useEffect(() => {
@@ -208,6 +226,7 @@ export const AuthProvider = ({ children }) => {
                 logout,
                 register,
                 forgotPassword,
+                confirmPassword,
             }}
         >
             {children}
