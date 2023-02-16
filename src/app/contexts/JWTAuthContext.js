@@ -109,67 +109,91 @@ export const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState)
 
     const login = async (email, password) => {
-        // const response = await axios.post('/api/auth/login', {           //comment - original data saved for backup
-        //     email,
-        //     password,
-        // })
-        const payLoad = {password: password, emailAddress: email};
-        const response = await axios.post(`${default_host}/auth/login`, payLoad)
+        try {
+            // const response = await axios.post('/api/auth/login', {           //comment - original data saved for backup
+            //     email,
+            //     password,
+            // })
+            const payLoad = { password: password, emailAddress: email };
+            const response = await axios.post(`${default_host}/auth/login`, payLoad)
 
-        // const { accessToken, user } = response.data                      //comment - original data saved for backup
-        const { tokens, user } = response.data
+            if (response.status === 200) {
+                alert("Login Successfully!");
+            }
+            console.log("Loginres", response);
 
-        // setSession(accessToken)                                          //comment - original data saved for backup
-        setSession(tokens.access.token, tokens.refresh.token)
+            // const { accessToken, user } = response.data                      //comment - original data saved for backup
+            const { tokens, user } = response.data
 
-        dispatch({
-            type: 'LOGIN',
-            payload: {
-                user,
-            },
-        })
+            // setSession(accessToken)                                          //comment - original data saved for backup
+            setSession(tokens.access.token, tokens.refresh.token)
+
+            dispatch({
+                type: 'LOGIN',
+                payload: {
+                    user,
+                },
+            })
+        } catch (e) {
+            alert(e.message);
+        }
     }
 
     // const register = async (email, username, password) => {              //comment - original data saved for backup
     // const register = async (email, password, role, firstName, lastName, mobileNumber, designation, organizationName) => {    //comment - previously for role
     const register = async (email, password, firstName, lastName, mobileNumber, designation, organizationName) => {
-        // const response = await axios.post('/api/auth/register', {        //comment - original data saved for backup
-        //     email,
-        //     username,
-        //     password,
-        // })
-        // const payLoad = {password: password, emailAddress: email, role: role, firstName: firstName, lastName: lastName, mobileNumber: (mobileNumber.toString()), designation: designation, organizationName: organizationName};      //comment - previously for role
-        const payLoad = {emailAddress: email, password: password, firstName: firstName, lastName: lastName, mobileNumber: (mobileNumber.toString()), designation: designation, organizationName: organizationName};
-        const response = await axios.post(`${default_host}/auth/register`, payLoad)
+        try {
+            // const response = await axios.post('/api/auth/register', {        //comment - original data saved for backup
+            //     email,
+            //     username,
+            //     password,
+            // })
+            // const payLoad = {password: password, emailAddress: email, role: role, firstName: firstName, lastName: lastName, mobileNumber: (mobileNumber.toString()), designation: designation, organizationName: organizationName};      //comment - previously for role
+            const payLoad = { emailAddress: email, password: password, firstName: firstName, lastName: lastName, mobileNumber: (mobileNumber.toString()), designation: designation, organizationName: organizationName };
+            const response = await axios.post(`${default_host}/auth/register`, payLoad)
+            if (response.status === 201) {
+                alert("Check your email to verify the account after that you can login");
+            }
+            if (response.status === 400) {
+                alert("Check your email to verify the account after that you can login");
+            }
+            // console.log("register", response);
+            const { accessToken, user } = response.data
 
-        const { accessToken, user } = response.data
+            setSession(accessToken)
+            dispatch({
+                type: 'REGISTER',
+                payload: {
+                    user,
+                },
+            })
+        } catch (e) {
+            alert(e.message);
+        }
 
-        setSession(accessToken)
-
-        dispatch({
-            type: 'REGISTER',
-            payload: {
-                user,
-            },
-        })
     }
 
     // const logout = () => {                                               //comment - original data saved for backup
     const logout = async () => {
-        const payLoad = {refreshToken: localStorage.getItem("refreshToken")};
+        const payLoad = { refreshToken: localStorage.getItem("refreshToken") };
         await axios.post(`${default_host}/auth/logout`, payLoad)
         setSession(null)
         dispatch({ type: 'LOGOUT' })
     }
 
     const forgotPassword = async (email) => {
-        const payLoad = {email: email, targetUrl: `${system_host}/session`};
-        await axios.post(`${default_host}/auth/forgot-password`, payLoad)
-        // dispatch({ type: 'FORGOTPASSWORD' })
+        try {
+            const payLoad = { email: email, targetUrl: `${system_host}/session` };
+            var res = await axios.post(`${default_host}/auth/forgot-password`, payLoad)
+            alert(res.data.message)
+            // dispatch({ type: 'FORGOTPASSWORD' })
+        } catch (e) {
+            alert(e.message);
+        }
     }
 
     const confirmPassword = async (password) => {
-        const payLoad = {password: password};
+        const payLoad = { password: password };
         await axios.post(`${default_host}/auth/reset-password`, payLoad)
         dispatch({ type: 'CONFIRMPASSWORD' })
     }
