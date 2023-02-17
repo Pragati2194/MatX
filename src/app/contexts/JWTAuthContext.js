@@ -151,11 +151,16 @@ export const AuthProvider = ({ children }) => {
             // const payLoad = {password: password, emailAddress: email, role: role, firstName: firstName, lastName: lastName, mobileNumber: (mobileNumber.toString()), designation: designation, organizationName: organizationName};      //comment - previously for role
             const payLoad = { emailAddress: email, password: password, firstName: firstName, lastName: lastName, mobileNumber: (mobileNumber.toString()), designation: designation, organizationName: organizationName };
             const response = await axios.post(`${default_host}/auth/register`, payLoad)
+            if (response.status === 201) {
+                alert("Check your email to verify the account after that you can login");
+            }
+            if (response.status === 400) {
+                alert("Check your email to verify the account after that you can login");
+            }
+            const { user } = response.data
 
-            const { tokens, user } = response.data
-
-            // setSession(accessToken)                                          //comment - original data saved for backup
-            setSession(tokens.access.token, tokens.refresh.token)
+            // // setSession(accessToken)                                          //comment - original data saved for backup
+            // setSession(tokens.access.token, tokens.refresh.token)
             dispatch({
                 type: 'REGISTER',
                 payload: {
@@ -164,6 +169,7 @@ export const AuthProvider = ({ children }) => {
             })
         } catch (e) {
             alert(e.message);
+            console.log(e.message);
         }
 
     }
